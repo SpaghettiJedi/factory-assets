@@ -27,34 +27,42 @@
   <div class="banner ok"><h1>VERDICT: SATISFIED</h1><p>SpaghettiJedi/lights-out PR #50</p></div>
   <div class="grid">
     <section><h2>Scope checklist</h2><ul>
-<li>✓ URLs with query parameters (like `?a=1&amp;b=2`) now render as complete clickable links instead of breaking at the ampersand</li>
-<li>✓ Surrounding text that contains HTML special characters stays properly escaped (e.g., `&lt;tag&gt;` renders as `&amp;lt;tag&amp;gt;`)</li>
-<li>✓ Test suite passes including the new test case demonstrating both behaviors</li>
-<li>✓ `make check` passes (verified per acceptance criteria)</li>
+<li>**Test coverage for URLs with query parameters:** Done. The new test verifies that a URL containing `?q=a=1&amp;b=2` renders as a single clickable link, and that surrounding HTML-special characters (`&lt;tag&gt;` and bare `&amp;`) are properly escaped.</li>
+<li>**`make check` passes:** Not verified by automated review. The operator must confirm the gate passed.</li>
 </ul></section>
     <section><h2>Proof summary</h2><ul><li><span class="pill unknown">see PR Proof</span> `npm test -- --run test/briefing-html.test.ts` passes, including a new case where a URL with ?a=1&amp;b=2 renders as one complete anchor and the surrounding text stays escaped</li><li><span class="pill unknown">see PR Proof</span> `make check` passes</li></ul></section>
   </div>
-  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>Switched from a single regex replace operation to manual iteration with matchAll. This makes the order explicit: find URLs in raw text first, escape non-URL portions, then escape and link each URL. More verbose but clearer than the original one-liner.</p></article></div>
+  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>**** The implementer chose to rewrite the URL-linking logic to process URLs before escaping (the first option in the WorkOrder) rather than switching to markdown-based linking. This keeps the existing bare-URL detection behavior while fixing the escaping order bug.</p></article>
+<article class="card"><h3>[technical]</h3><p>**** The implementation uses a manual iteration loop (`matchAll` + string slicing) instead of a regex replace callback. This makes the escaping order explicit: non-URL text gets escaped separately from URLs, which then get escaped and wrapped in anchor tags.</p></article></div>
   <section><h2>Deviations</h2><p>No deviations reported.</p></section>
   <section><h2>Canonical plain-text briefing</h2><pre>VERDICT: SATISFIED
 
 ## Operator Briefing
 
 ### Scope: done / not done
-- ✓ URLs with query parameters (like `?a=1&amp;b=2`) now render as complete clickable links instead of breaking at the ampersand
-- ✓ Surrounding text that contains HTML special characters stays properly escaped (e.g., `&lt;tag&gt;` renders as `&amp;lt;tag&amp;gt;`)
-- ✓ Test suite passes including the new test case demonstrating both behaviors
-- ✓ `make check` passes (verified per acceptance criteria)
+
+- **Test coverage for URLs with query parameters:** Done. The new test verifies that a URL containing `?q=a=1&amp;b=2` renders as a single clickable link, and that surrounding HTML-special characters (`&lt;tag&gt;` and bare `&amp;`) are properly escaped.
+
+- **`make check` passes:** Not verified by automated review. The operator must confirm the gate passed.
 
 ### Decisions not in the spec
-- [technical] Switched from a single regex replace operation to manual iteration with matchAll. This makes the order explicit: find URLs in raw text first, escape non-URL portions, then escape and link each URL. More verbose but clearer than the original one-liner.
+
+- **[technical]** The implementer chose to rewrite the URL-linking logic to process URLs before escaping (the first option in the WorkOrder) rather than switching to markdown-based linking. This keeps the existing bare-URL detection behavior while fixing the escaping order bug.
+
+- **[technical]** The implementation uses a manual iteration loop (`matchAll` + string slicing) instead of a regex replace callback. This makes the escaping order explicit: non-URL text gets escaped separately from URLs, which then get escaped and wrapped in anchor tags.
 
 ### Manual checks for the operator
-Nothing — the test suite verifies the rendering behavior completely. All acceptance criteria are automated gates.
+
+1. **Verify `make check` passed** — confirm the implementer&#39;s CI run or re-run locally. The diff contains no syntax errors or import violations visible to static review, but the full gate suite must pass.
+
+2. **Spot-check an actual rendered briefing** (if one is readily available) to confirm URLs with `&amp;` in query strings now link correctly end-to-end. This is low-priority since the test coverage directly exercises the changed function.
+
+These checks won&#39;t recur — the test suite now covers this case permanently.
 
 ### Be aware
+
 Nothing.</pre></section>
-  <footer>Cost/usage: input 9, output 2052, cost 0.07484460000000001 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/50" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/50</a>.</footer>
+  <footer>Cost/usage: input 9, output 2399, cost 0.08012760000000001 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/50" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/50</a>.</footer>
 </main>
 </body>
 </html>

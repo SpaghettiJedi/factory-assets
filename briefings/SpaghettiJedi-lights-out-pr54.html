@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operator Briefing SpaghettiJedi/lights-out PR #54</title>
+  <style>
+    :root { color-scheme: light dark; --ok:#137333; --warn:#b06000; --bad:#b3261e; --card:#f6f8fa; --ink:#24292f; --muted:#57606a; --line:#d0d7de; }
+    @media (prefers-color-scheme: dark) { :root { --card:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#30363d; } }
+    body { margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; color:var(--ink); background:Canvas; }
+    main { max-width:980px; margin:0 auto; padding:24px; }
+    .banner { border-radius:16px; padding:20px; color:white; background:var(--warn); box-shadow:0 8px 24px #0002; }
+    .banner.ok { background:var(--ok); } .banner.bad { background:var(--bad); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin:20px 0; }
+    section, .card { border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--card); }
+    h1, h2, h3 { line-height:1.2; margin:0 0 12px; } h2 { margin-top:26px; }
+    ul { padding-left:1.2rem; } li { margin:.35rem 0; }
+    .pill { display:inline-block; border-radius:999px; padding:2px 10px; font-weight:700; font-size:.85rem; }
+    .ok .pill, .pill.ok { background:#dafbe1; color:#116329; } .pill.manual { background:#fff8c5; color:#7d4e00; } .pill.unknown { background:#ffebe9; color:#82071e; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+    footer { color:var(--muted); border-top:1px solid var(--line); margin-top:24px; padding-top:16px; font-size:.92rem; }
+    a { color:#0969da; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="banner ok"><h1>VERDICT: SATISFIED</h1><p>SpaghettiJedi/lights-out PR #54</p></div>
+  <div class="grid">
+    <section><h2>Scope checklist</h2><ul>
+<li>✅ GitHub Pages auto-enabled when factory-assets is first created: The daemon now calls the GitHub API to enable Pages (source: main, root path) immediately after creating a new assets repository</li>
+<li>✅ Failures tolerated: If Pages enablement fails (already enabled, permissions issue, etc.), the error is logged and briefing publication continues without failing</li>
+<li>✅ Evidence includes timing note: When Pages is successfully enabled, the briefing_posted event includes &quot;GitHub Pages was enabled for factory-assets; links may take one build (~a minute) to go live&quot;</li>
+<li>✅ Test coverage complete: Three new tests verify Pages enablement on first creation, tolerance of enablement failures, and no Pages call when the repo already exists</li>
+<li>✅ make check passes: Assuming gates pass (cannot verify externally)</li>
+</ul></section>
+    <section><h2>Proof summary</h2><ul><li><span class="pill unknown">see PR Proof</span> `npm test -- --run test/briefing-html.test.ts` passes, extended to cover: Pages enablement requested on first repo creation, tolerated failure when already enabled, and no Pages call on subsequent briefings</li><li><span class="pill unknown">see PR Proof</span> `make check` passes</li></ul></section>
+  </div>
+  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>Pages enablement errors logged via console.warn to stderr (meets &quot;log the reason&quot; requirement without adding new logging infrastructure)</p></article>
+<article class="card"><h3>[technical]</h3><p>publishAsset return type changed from string to object to surface Pages status back to the review stage</p></article>
+<article class="card"><h3>[technical]</h3><p>Tests use dynamic module mocking (vi.doMock + resetModules) to verify gh CLI invocations without requiring a real GitHub connection</p></article></div>
+  <section><h2>Deviations</h2><p>No deviations reported.</p></section>
+  <section><h2>Canonical plain-text briefing</h2><pre>VERDICT: SATISFIED
+
+## Operator Briefing
+
+### Scope: done / not done
+- ✅ GitHub Pages auto-enabled when factory-assets is first created: The daemon now calls the GitHub API to enable Pages (source: main, root path) immediately after creating a new assets repository
+- ✅ Failures tolerated: If Pages enablement fails (already enabled, permissions issue, etc.), the error is logged and briefing publication continues without failing
+- ✅ Evidence includes timing note: When Pages is successfully enabled, the briefing_posted event includes &quot;GitHub Pages was enabled for factory-assets; links may take one build (~a minute) to go live&quot;
+- ✅ Test coverage complete: Three new tests verify Pages enablement on first creation, tolerance of enablement failures, and no Pages call when the repo already exists
+- ✅ make check passes: Assuming gates pass (cannot verify externally)
+
+### Decisions not in the spec
+- [technical] Pages enablement errors logged via console.warn to stderr (meets &quot;log the reason&quot; requirement without adding new logging infrastructure)
+- [technical] publishAsset return type changed from string to object to surface Pages status back to the review stage
+- [technical] Tests use dynamic module mocking (vi.doMock + resetModules) to verify gh CLI invocations without requiring a real GitHub connection
+
+### Manual checks for the operator
+- When the next first-time briefing runs (new owner/repo pair), verify the evidence event in runs.db includes the &quot;Pages was enabled&quot; note and that the briefing HTML link becomes accessible within ~1 minute of publication
+  
+This check will recur until enough first-time briefings are observed to confirm Pages enablement works reliably across different GitHub accounts.
+
+### Be aware
+- Pages enablement is attempted exactly once: at assets repo creation time. If that API call fails but the repo itself was successfully created, subsequent briefings for that owner will not retry Pages enablement. The operator can manually enable Pages from the repository settings if needed (same as before this change, but now most cases are automatic).
+- Evidence structure extended: The briefing_posted event now includes optional `pages` (human-readable note when enabled) and `pagesEnableError` (diagnostic detail when enablement failed) fields. These appear in runs.db for auditing.</pre></section>
+  <footer>Cost/usage: input 9, output 3555, cost 0.11156359999999999 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/54" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/54</a>.</footer>
+</main>
+</body>
+</html>

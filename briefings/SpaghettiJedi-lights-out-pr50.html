@@ -27,30 +27,34 @@
   <div class="banner ok"><h1>VERDICT: SATISFIED</h1><p>SpaghettiJedi/lights-out PR #50</p></div>
   <div class="grid">
     <section><h2>Scope checklist</h2><ul>
-<li>✅ **Test passes with query param URL case**: New test confirms URLs containing `?a=1&amp;b=2` render as one complete anchor while surrounding HTML characters (like `&lt;tag&gt;` and standalone `&amp;`) are properly escaped</li>
-<li>✅ **make check passes**: Verification confirms all gates pass</li>
+<li>✓ URLs with query parameters (like `?a=1&amp;b=2`) now render as complete clickable links instead of breaking at the ampersand</li>
+<li>✓ Surrounding text that contains HTML special characters stays properly escaped (e.g., `&lt;tag&gt;` renders as `&amp;lt;tag&amp;gt;`)</li>
+<li>✓ Test suite passes including the new test case demonstrating both behaviors</li>
+<li>✓ `make check` passes (verified per acceptance criteria)</li>
 </ul></section>
     <section><h2>Proof summary</h2><ul><li><span class="pill unknown">see PR Proof</span> `npm test -- --run test/briefing-html.test.ts` passes, including a new case where a URL with ?a=1&amp;b=2 renders as one complete anchor and the surrounding text stays escaped</li><li><span class="pill unknown">see PR Proof</span> `make check` passes</li></ul></section>
   </div>
-  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>**** Chose the &quot;detect URLs before escaping&quot; approach from the two options offered in the WorkOrder (the alternative was markdown syntax parsing). Implementation now matches URLs in raw text, then separately escapes (a) text before each URL, (b) the URL itself for both href and display, and (c) text after all URLs.</p></article></div>
+  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>Switched from a single regex replace operation to manual iteration with matchAll. This makes the order explicit: find URLs in raw text first, escape non-URL portions, then escape and link each URL. More verbose but clearer than the original one-liner.</p></article></div>
   <section><h2>Deviations</h2><p>No deviations reported.</p></section>
   <section><h2>Canonical plain-text briefing</h2><pre>VERDICT: SATISFIED
 
 ## Operator Briefing
 
 ### Scope: done / not done
-- ✅ **Test passes with query param URL case**: New test confirms URLs containing `?a=1&amp;b=2` render as one complete anchor while surrounding HTML characters (like `&lt;tag&gt;` and standalone `&amp;`) are properly escaped
-- ✅ **make check passes**: Verification confirms all gates pass
+- ✓ URLs with query parameters (like `?a=1&amp;b=2`) now render as complete clickable links instead of breaking at the ampersand
+- ✓ Surrounding text that contains HTML special characters stays properly escaped (e.g., `&lt;tag&gt;` renders as `&amp;lt;tag&amp;gt;`)
+- ✓ Test suite passes including the new test case demonstrating both behaviors
+- ✓ `make check` passes (verified per acceptance criteria)
 
 ### Decisions not in the spec
-- **[technical]** Chose the &quot;detect URLs before escaping&quot; approach from the two options offered in the WorkOrder (the alternative was markdown syntax parsing). Implementation now matches URLs in raw text, then separately escapes (a) text before each URL, (b) the URL itself for both href and display, and (c) text after all URLs.
+- [technical] Switched from a single regex replace operation to manual iteration with matchAll. This makes the order explicit: find URLs in raw text first, escape non-URL portions, then escape and link each URL. More verbose but clearer than the original one-liner.
 
 ### Manual checks for the operator
-None. The test coverage is comprehensive — it exercises the exact bug (ampersand in query string breaking URL detection) and validates both the fix (complete anchor) and the safety requirement (surrounding text still escaped).
+Nothing — the test suite verifies the rendering behavior completely. All acceptance criteria are automated gates.
 
 ### Be aware
 Nothing.</pre></section>
-  <footer>Cost/usage: input 9, output 3159, cost 0.09143659999999999 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/50" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/50</a>.</footer>
+  <footer>Cost/usage: input 9, output 2052, cost 0.07484460000000001 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/50" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/50</a>.</footer>
 </main>
 </body>
 </html>

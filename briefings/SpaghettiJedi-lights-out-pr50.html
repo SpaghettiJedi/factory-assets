@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operator Briefing SpaghettiJedi/lights-out PR #50</title>
+  <style>
+    :root { color-scheme: light dark; --ok:#137333; --warn:#b06000; --bad:#b3261e; --card:#f6f8fa; --ink:#24292f; --muted:#57606a; --line:#d0d7de; }
+    @media (prefers-color-scheme: dark) { :root { --card:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#30363d; } }
+    body { margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; color:var(--ink); background:Canvas; }
+    main { max-width:980px; margin:0 auto; padding:24px; }
+    .banner { border-radius:16px; padding:20px; color:white; background:var(--warn); box-shadow:0 8px 24px #0002; }
+    .banner.ok { background:var(--ok); } .banner.bad { background:var(--bad); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin:20px 0; }
+    section, .card { border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--card); }
+    h1, h2, h3 { line-height:1.2; margin:0 0 12px; } h2 { margin-top:26px; }
+    ul { padding-left:1.2rem; } li { margin:.35rem 0; }
+    .pill { display:inline-block; border-radius:999px; padding:2px 10px; font-weight:700; font-size:.85rem; }
+    .ok .pill, .pill.ok { background:#dafbe1; color:#116329; } .pill.manual { background:#fff8c5; color:#7d4e00; } .pill.unknown { background:#ffebe9; color:#82071e; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+    footer { color:var(--muted); border-top:1px solid var(--line); margin-top:24px; padding-top:16px; font-size:.92rem; }
+    a { color:#0969da; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="banner ok"><h1>VERDICT: SATISFIED</h1><p>SpaghettiJedi/lights-out PR #50</p></div>
+  <div class="grid">
+    <section><h2>Scope checklist</h2><ul>
+<li>✅ **Test passes with query param URL case**: New test confirms URLs containing `?a=1&amp;b=2` render as one complete anchor while surrounding HTML characters (like `&lt;tag&gt;` and standalone `&amp;`) are properly escaped</li>
+<li>✅ **make check passes**: Verification confirms all gates pass</li>
+</ul></section>
+    <section><h2>Proof summary</h2><ul><li><span class="pill unknown">see PR Proof</span> `npm test -- --run test/briefing-html.test.ts` passes, including a new case where a URL with ?a=1&amp;b=2 renders as one complete anchor and the surrounding text stays escaped</li><li><span class="pill unknown">see PR Proof</span> `make check` passes</li></ul></section>
+  </div>
+  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>**** Chose the &quot;detect URLs before escaping&quot; approach from the two options offered in the WorkOrder (the alternative was markdown syntax parsing). Implementation now matches URLs in raw text, then separately escapes (a) text before each URL, (b) the URL itself for both href and display, and (c) text after all URLs.</p></article></div>
+  <section><h2>Deviations</h2><p>No deviations reported.</p></section>
+  <section><h2>Canonical plain-text briefing</h2><pre>VERDICT: SATISFIED
+
+## Operator Briefing
+
+### Scope: done / not done
+- ✅ **Test passes with query param URL case**: New test confirms URLs containing `?a=1&amp;b=2` render as one complete anchor while surrounding HTML characters (like `&lt;tag&gt;` and standalone `&amp;`) are properly escaped
+- ✅ **make check passes**: Verification confirms all gates pass
+
+### Decisions not in the spec
+- **[technical]** Chose the &quot;detect URLs before escaping&quot; approach from the two options offered in the WorkOrder (the alternative was markdown syntax parsing). Implementation now matches URLs in raw text, then separately escapes (a) text before each URL, (b) the URL itself for both href and display, and (c) text after all URLs.
+
+### Manual checks for the operator
+None. The test coverage is comprehensive — it exercises the exact bug (ampersand in query string breaking URL detection) and validates both the fix (complete anchor) and the safety requirement (surrounding text still escaped).
+
+### Be aware
+Nothing.</pre></section>
+  <footer>Cost/usage: input 9, output 3159, cost 0.09143659999999999 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/50" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/50</a>.</footer>
+</main>
+</body>
+</html>

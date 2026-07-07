@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operator Briefing SpaghettiJedi/lights-out PR #52</title>
+  <style>
+    :root { color-scheme: light dark; --ok:#137333; --warn:#b06000; --bad:#b3261e; --card:#f6f8fa; --ink:#24292f; --muted:#57606a; --line:#d0d7de; }
+    @media (prefers-color-scheme: dark) { :root { --card:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#30363d; } }
+    body { margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; color:var(--ink); background:Canvas; }
+    main { max-width:980px; margin:0 auto; padding:24px; }
+    .banner { border-radius:16px; padding:20px; color:white; background:var(--warn); box-shadow:0 8px 24px #0002; }
+    .banner.ok { background:var(--ok); } .banner.bad { background:var(--bad); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin:20px 0; }
+    section, .card { border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--card); }
+    h1, h2, h3 { line-height:1.2; margin:0 0 12px; } h2 { margin-top:26px; }
+    ul { padding-left:1.2rem; } li { margin:.35rem 0; }
+    .pill { display:inline-block; border-radius:999px; padding:2px 10px; font-weight:700; font-size:.85rem; }
+    .ok .pill, .pill.ok { background:#dafbe1; color:#116329; } .pill.manual { background:#fff8c5; color:#7d4e00; } .pill.unknown { background:#ffebe9; color:#82071e; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+    footer { color:var(--muted); border-top:1px solid var(--line); margin-top:24px; padding-top:16px; font-size:.92rem; }
+    a { color:#0969da; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="banner ok"><h1>VERDICT: SATISFIED</h1><p>SpaghettiJedi/lights-out PR #52</p></div>
+  <div class="grid">
+    <section><h2>Scope checklist</h2><ul>
+<li>**✅ Caffeinate spawn with daemon-tied lifecycle**: The daemon now spawns `caffeinate -i -w &lt;pid&gt;` as a detached child process on startup; caffeinate automatically exits when the daemon process ends via the `-w` flag behavior. Works in both service and foreground modes.</li>
+<li>**✅ Graceful non-macOS fallback**: When caffeinate is unavailable (spawn fails or process errors after spawn), the system logs one line to stderr and continues normal operation. The daemon never fails over missing keep-awake support.</li>
+<li>**✅ Bounded retry for checkout operations**: Both fetch and clone operations in `ensureCheckout` now attempt one retry after 30s delay before declaring a target unavailable. A dark-wake network blip during the first attempt no longer skips the entire poll pass.</li>
+<li>**✅ Retry evidence recording**: When a retry rescues a failing checkout operation, the system logs to stderr and writes an evidence record with `type: &quot;checkout_retry&quot;` containing the operation type and original error.</li>
+<li>**✅ Test coverage**: All acceptance criteria covered by automated tests verifying caffeinate spawn arguments, fallback behavior, fetch retry success, and fetch retry failure cases.</li>
+</ul></section>
+    <section><h2>Proof summary</h2><ul><li><span class="pill unknown">see PR Proof</span> `npm test -- --run test/keep-awake.test.ts` passes, covering: caffeinate spawn arguments tied to the daemon pid, graceful no-caffeinate fallback, and the single-retry-then-fail behavior of the checkout fetch (fake binaries/fixtures, patterns exist in test/pi-session.test.ts and test/worktree.test.ts)</li><li><span class="pill unknown">see PR Proof</span> `make check` passes</li></ul></section>
+  </div>
+  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>**** When both initial attempt and retry fail, the system throws the original error, not the retry error. This preserves the first failure in diagnostics rather than potentially confusing retry-specific errors.</p></article>
+<article class="card"><h3>[technical]</h3><p>**** For clone operations, partial directories created before failure are removed via `rmSync` before retry to prevent orphaned checkout state.</p></article>
+<article class="card"><h3>[technical]</h3><p>**** The 30s retry delay uses `Atomics.wait` for synchronous blocking sleep. This is appropriate for the daemon&#39;s single-threaded poll loop but would freeze a GUI application.</p></article>
+<article class="card"><h3>[technical]</h3><p>**** Tests cover fetch retry but not clone retry. Clone uses `gh repo clone` (harder to fake in tests), but both paths use the same `withSingleRetry` helper, providing transitive confidence.</p></article>
+<article class="card"><h3>[technical]</h3><p>**** Child process error events (caffeinate failing after spawn completes) log and continue but cannot trigger daemon-level behavior. Only synchronous spawn errors and retry logic are fully testable.</p></article></div>
+  <section><h2>Deviations</h2><p>No deviations reported.</p></section>
+  <section><h2>Canonical plain-text briefing</h2><pre>VERDICT: SATISFIED
+
+## Operator Briefing
+
+### Scope: done / not done
+
+- **✅ Caffeinate spawn with daemon-tied lifecycle**: The daemon now spawns `caffeinate -i -w &lt;pid&gt;` as a detached child process on startup; caffeinate automatically exits when the daemon process ends via the `-w` flag behavior. Works in both service and foreground modes.
+
+- **✅ Graceful non-macOS fallback**: When caffeinate is unavailable (spawn fails or process errors after spawn), the system logs one line to stderr and continues normal operation. The daemon never fails over missing keep-awake support.
+
+- **✅ Bounded retry for checkout operations**: Both fetch and clone operations in `ensureCheckout` now attempt one retry after 30s delay before declaring a target unavailable. A dark-wake network blip during the first attempt no longer skips the entire poll pass.
+
+- **✅ Retry evidence recording**: When a retry rescues a failing checkout operation, the system logs to stderr and writes an evidence record with `type: &quot;checkout_retry&quot;` containing the operation type and original error.
+
+- **✅ Test coverage**: All acceptance criteria covered by automated tests verifying caffeinate spawn arguments, fallback behavior, fetch retry success, and fetch retry failure cases.
+
+### Decisions not in the spec
+
+- **[technical]** When both initial attempt and retry fail, the system throws the original error, not the retry error. This preserves the first failure in diagnostics rather than potentially confusing retry-specific errors.
+
+- **[technical]** For clone operations, partial directories created before failure are removed via `rmSync` before retry to prevent orphaned checkout state.
+
+- **[technical]** The 30s retry delay uses `Atomics.wait` for synchronous blocking sleep. This is appropriate for the daemon&#39;s single-threaded poll loop but would freeze a GUI application.
+
+- **[technical]** Tests cover fetch retry but not clone retry. Clone uses `gh repo clone` (harder to fake in tests), but both paths use the same `withSingleRetry` helper, providing transitive confidence.
+
+- **[technical]** Child process error events (caffeinate failing after spawn completes) log and continue but cannot trigger daemon-level behavior. Only synchronous spawn errors and retry logic are fully testable.
+
+### Manual checks for the operator
+
+None — both acceptance criteria (`make check` and the specific test suite) are fully automated.
+
+### Be aware
+
+**Blocking sleep during retry**: The daemon blocks for the full 30s between checkout attempts using `Atomics.wait`. This is intentional (simpler than async sleep, appropriate for the single-threaded daemon), but means no other poll work happens during that window. Each target&#39;s checkout retry pauses that target&#39;s processing only, not the entire pass.
+
+**Evidence only on rescue, not on final failure**: The `checkout_retry` evidence event fires only when the retry succeeds. If both attempts fail, the operation fails normally with no special evidence marker. This matches the WorkOrder&#39;s &quot;when the retry rescues the pass&quot; language.</pre></section>
+  <footer>Cost/usage: input 9, output 5384, cost 0.1489306 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/52" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/52</a>.</footer>
+</main>
+</body>
+</html>

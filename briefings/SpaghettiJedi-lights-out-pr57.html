@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operator Briefing SpaghettiJedi/lights-out PR #57</title>
+  <style>
+    :root { color-scheme: light dark; --ok:#137333; --warn:#b06000; --bad:#b3261e; --card:#f6f8fa; --ink:#24292f; --muted:#57606a; --line:#d0d7de; }
+    @media (prefers-color-scheme: dark) { :root { --card:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#30363d; } }
+    body { margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; color:var(--ink); background:Canvas; }
+    main { max-width:980px; margin:0 auto; padding:24px; }
+    .banner { border-radius:16px; padding:20px; color:white; background:var(--warn); box-shadow:0 8px 24px #0002; }
+    .banner.ok { background:var(--ok); } .banner.bad { background:var(--bad); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin:20px 0; }
+    section, .card { border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--card); }
+    h1, h2, h3 { line-height:1.2; margin:0 0 12px; } h2 { margin-top:26px; }
+    ul { padding-left:1.2rem; } li { margin:.35rem 0; }
+    .pill { display:inline-block; border-radius:999px; padding:2px 10px; font-weight:700; font-size:.85rem; }
+    .ok .pill, .pill.ok { background:#dafbe1; color:#116329; } .pill.manual { background:#fff8c5; color:#7d4e00; } .pill.unknown { background:#ffebe9; color:#82071e; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+    footer { color:var(--muted); border-top:1px solid var(--line); margin-top:24px; padding-top:16px; font-size:.92rem; }
+    a { color:#0969da; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="banner ok"><h1>VERDICT: SATISFIED</h1><p>SpaghettiJedi/lights-out PR #57</p></div>
+  <div class="grid">
+    <section><h2>Scope checklist</h2><ul>
+<li>**Design tokens in rendered output** — DONE. All specified colors (#E4ECF7 surface, #0E1A2E navy, #D0E4EE ice, #E89028 orange, #45C9E0 cyan, semantic risk/warn/success pairs) and typography (Saira Condensed masthead, Saira headings) are present and asserted in tests.</li>
+<li>**Deviation log renders all four fields** — DONE. Each deviation entry displays &quot;What the plan said&quot; (expected), &quot;What the code revealed&quot; (found), &quot;Conservative choice&quot; (decision), and &quot;Fold forward&quot; (carryForward). Test fixture confirms all four fields render correctly.</li>
+<li>**Output remains free of external asset URLs** — DONE. Fonts are specified as fallback stacks only (no web font loading). Test confirms no script, link, img, or iframe tags with external sources.</li>
+<li>**make check passes** — DONE (verify in CI).</li>
+<li>**[judgment] Rendered briefing reads as lights-out brand and is pleasant to act on** — Operator must confirm on next live briefing. Look for: cohesive color scheme (ice blue surface with navy text), clear information hierarchy (metadata bar, verdict banner, deviation log), professional polish (shadows, rounded corners, typography rhythm). This check will recur until brand identity is validated in production.</li>
+</ul></section>
+    <section><h2>Proof summary</h2><ul><li><span class="pill unknown">see PR Proof</span> `npm test -- --run test/briefing-html.test.ts` passes, extended to assert: the design tokens above appear in the rendered output, the deviation log renders all four fields per entry from a fixture, and the output remains free of external asset URLs</li><li><span class="pill unknown">see PR Proof</span> `make check` passes</li><li><span class="pill manual">operator check</span> [judgment] The rendered briefing reads as the lights-out brand and is pleasant to act on (operator confirms on next live briefing)</li></ul></section>
+  </div>
+  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>Adapter test timeouts increased from 500ms to 5,000ms in four tests (runTurn calls). This change is unrelated to the briefing reskin — the modified tests don&#39;t exercise HTML rendering. Appears to be an opportunistic reliability improvement made while touching the test directory.</p></article>
+<article class="card"><h3>[technical]</h3><p>Decision cards now have differentiated styling: product cards use orange top border, technical cards use cyan. Reinforces the semantic distinction between the two decision types.</p></article>
+<article class="card"><h3>[technical]</h3><p>Metadata bar implemented as responsive grid with auto-fit and 150px minimum column width. Layout adapts to viewport width automatically.</p></article>
+<article class="card"><h3>[technical]</h3><p>Deviation log entries use a thick orange left border (6px) instead of full card styling to visually distinguish them as a chronological sequence.</p></article></div>
+  <section><h2>Deviations</h2><ul>
+<li>**Output remains free of external asset URLs** — DONE. Fonts are specified as fallback stacks only (no web font loading). Test confirms no script, link, img, or iframe tags with external sources.</li>
+<li>**make check passes** — DONE (verify in CI).</li>
+<li>**[judgment] Rendered briefing reads as lights-out brand and is pleasant to act on** — Operator must confirm on next live briefing. Look for: cohesive color scheme (ice blue surface with navy text), clear information hierarchy (metadata bar, verdict banner, deviation log), professional polish (shadows, rounded corners, typography rhythm). This check will recur until brand identity is validated in production.</li>
+</ul></section>
+  <section><h2>Canonical plain-text briefing</h2><pre>VERDICT: SATISFIED
+
+## Operator Briefing
+
+### Scope: done / not done
+
+- **Design tokens in rendered output** — DONE. All specified colors (#E4ECF7 surface, #0E1A2E navy, #D0E4EE ice, #E89028 orange, #45C9E0 cyan, semantic risk/warn/success pairs) and typography (Saira Condensed masthead, Saira headings) are present and asserted in tests.
+
+- **Deviation log renders all four fields** — DONE. Each deviation entry displays &quot;What the plan said&quot; (expected), &quot;What the code revealed&quot; (found), &quot;Conservative choice&quot; (decision), and &quot;Fold forward&quot; (carryForward). Test fixture confirms all four fields render correctly.
+
+- **Output remains free of external asset URLs** — DONE. Fonts are specified as fallback stacks only (no web font loading). Test confirms no script, link, img, or iframe tags with external sources.
+
+- **make check passes** — DONE (verify in CI).
+
+- **[judgment] Rendered briefing reads as lights-out brand and is pleasant to act on** — Operator must confirm on next live briefing. Look for: cohesive color scheme (ice blue surface with navy text), clear information hierarchy (metadata bar, verdict banner, deviation log), professional polish (shadows, rounded corners, typography rhythm). This check will recur until brand identity is validated in production.
+
+### Decisions not in the spec
+
+- [technical] Adapter test timeouts increased from 500ms to 5,000ms in four tests (runTurn calls). This change is unrelated to the briefing reskin — the modified tests don&#39;t exercise HTML rendering. Appears to be an opportunistic reliability improvement made while touching the test directory.
+
+- [technical] Decision cards now have differentiated styling: product cards use orange top border, technical cards use cyan. Reinforces the semantic distinction between the two decision types.
+
+- [technical] Metadata bar implemented as responsive grid with auto-fit and 150px minimum column width. Layout adapts to viewport width automatically.
+
+- [technical] Deviation log entries use a thick orange left border (6px) instead of full card styling to visually distinguish them as a chronological sequence.
+
+### Manual checks for the operator
+
+**Brand validation check** (next time a real briefing is generated):
+1. Open the briefing HTML in a browser
+2. Verify the color scheme feels cohesive: ice-blue background, navy text, orange accents used sparingly
+3. Verify typography rhythm: masthead feels bold and condensed, headings are clear, body text is readable
+4. Verify information hierarchy: can you quickly find verdict, metadata, deviations, and decisions?
+5. Verify deviation log clarity: can you scan the chronological sequence and understand what diverged?
+
+Success looks like: &quot;I can act on this without friction; the brand feels intentional and professional.&quot; This check will recur until the operator confirms the brand identity in production; after validation, it can be removed (brand will be frozen).
+
+### Be aware
+
+**Cost/usage**: Standard usage, no additional billable operations introduced.
+
+**Unrelated improvement**: The adapter test timeout changes are visible in the diff but not part of the briefing reskin. They don&#39;t affect briefing functionality and appear to be a separate test reliability fix. If you prefer this in a separate commit or PR for change isolation, flag it back to the implementing agent.
+
+**Self-contained constraint preserved**: The &quot;no external assets&quot; property was already tested and remains enforced. Any future changes to the template must maintain this constraint (no CDN fonts, no external CSS, no tracking pixels).</pre></section>
+  <footer>Cost/usage: input 9, output 4127, cost 0.1461616 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/57" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/57</a>.</footer>
+</main>
+</body>
+</html>

@@ -5,26 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Operator Briefing SpaghettiJedi/lights-out PR #58</title>
   <style>
-    :root { color-scheme: light dark; --ok:#137333; --warn:#b06000; --bad:#b3261e; --card:#f6f8fa; --ink:#24292f; --muted:#57606a; --line:#d0d7de; }
-    @media (prefers-color-scheme: dark) { :root { --card:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#30363d; } }
-    body { margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; color:var(--ink); background:Canvas; }
-    main { max-width:980px; margin:0 auto; padding:24px; }
-    .banner { border-radius:16px; padding:20px; color:white; background:var(--warn); box-shadow:0 8px 24px #0002; }
-    .banner.ok { background:var(--ok); } .banner.bad { background:var(--bad); }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin:20px 0; }
-    section, .card { border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--card); }
-    h1, h2, h3 { line-height:1.2; margin:0 0 12px; } h2 { margin-top:26px; }
+    :root {
+      color-scheme: light;
+      --surface:#E4ECF7;
+      --on-surface:#0E1A2E;
+      --brand-ice:#D0E4EE;
+      --accent-orange:#E89028;
+      --focus-cyan:#45C9E0;
+      --risk:#9B2D1F;
+      --risk-bg:#FCEAE5;
+      --warn:#7B5210;
+      --warn-bg:#FAEFD7;
+      --success:#266732;
+      --success-bg:#E4F2E6;
+      --card:#F8FBFF;
+      --line:#B8C9D8;
+      --muted:#42526B;
+      --shadow:0 18px 50px #0E1A2E24;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--on-surface); background:var(--surface); }
+    main { max-width:1120px; margin:0 auto; padding:28px; }
+    .masthead { border:2px solid var(--on-surface); border-radius:28px; padding:28px; background:linear-gradient(135deg, var(--brand-ice), var(--card)); box-shadow:var(--shadow); }
+    .eyebrow { margin:0 0 8px; color:var(--muted); font:700 1rem/1.1 "Saira", system-ui, sans-serif; letter-spacing:.16em; text-transform:uppercase; }
+    h1 { margin:0; font:800 clamp(2.4rem, 7vw, 5.5rem)/.85 "Saira Condensed", "Arial Narrow", system-ui, sans-serif; letter-spacing:.01em; text-transform:uppercase; }
+    h2, h3 { font-family:"Saira", system-ui, sans-serif; line-height:1.15; margin:0 0 12px; }
+    h2 { margin-top:30px; font-size:1.45rem; }
+    h3 { font-size:1.05rem; }
+    a { color:var(--on-surface); text-decoration-color:var(--focus-cyan); text-decoration-thickness:2px; text-underline-offset:3px; }
+    .verdict { display:inline-flex; margin-top:18px; border:2px solid currentColor; border-radius:999px; padding:8px 14px; font:800 1rem/1 "Saira", system-ui, sans-serif; background:var(--warn-bg); color:var(--warn); }
+    .verdict.ok { background:var(--success-bg); color:var(--success); }
+    .verdict.bad { background:var(--risk-bg); color:var(--risk); }
+    .metadata { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:22px 0 4px; }
+    .meta { border:1px solid var(--line); border-radius:16px; padding:12px 14px; background:#FFFFFF80; }
+    .meta span { display:block; color:var(--muted); font:700 .78rem/1 "Saira", system-ui, sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+    .meta strong { display:block; margin-top:5px; overflow-wrap:anywhere; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:16px; margin:18px 0; }
+    section, .card, .deviation { border:1px solid var(--line); border-radius:22px; padding:18px; background:var(--card); box-shadow:0 10px 24px #0E1A2E12; }
+    .card { border-top:5px solid var(--accent-orange); }
+    .card.technical { border-top-color:var(--focus-cyan); }
     ul { padding-left:1.2rem; } li { margin:.35rem 0; }
-    .pill { display:inline-block; border-radius:999px; padding:2px 10px; font-weight:700; font-size:.85rem; }
-    .ok .pill, .pill.ok { background:#dafbe1; color:#116329; } .pill.manual { background:#fff8c5; color:#7d4e00; } .pill.unknown { background:#ffebe9; color:#82071e; }
-    pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+    .pill { display:inline-block; border-radius:999px; padding:3px 10px; font:800 .82rem/1.2 "Saira", system-ui, sans-serif; }
+    .pill.manual { background:var(--warn-bg); color:var(--warn); }
+    .pill.unknown { background:var(--risk-bg); color:var(--risk); }
+    .deviation-log { display:grid; gap:14px; }
+    .deviation { border-left:6px solid var(--accent-orange); }
+    .deviation .index { color:var(--muted); font:800 .84rem/1 "Saira", system-ui, sans-serif; letter-spacing:.1em; text-transform:uppercase; }
+    .fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-top:12px; }
+    .field { border-radius:14px; padding:12px; background:var(--brand-ice); }
+    .field b { display:block; margin-bottom:5px; font-family:"Saira", system-ui, sans-serif; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; margin:0; }
     footer { color:var(--muted); border-top:1px solid var(--line); margin-top:24px; padding-top:16px; font-size:.92rem; }
-    a { color:#0969da; }
+    :focus-visible { outline:3px solid var(--focus-cyan); outline-offset:3px; }
   </style>
 </head>
 <body>
 <main>
-  <div class="banner ok"><h1>VERDICT: SATISFIED</h1><p>SpaghettiJedi/lights-out PR #58</p></div>
+  <header class="masthead">
+    <p class="eyebrow">lights-out Operator Briefing</p>
+    <h1>SpaghettiJedi/lights-out PR #58</h1>
+    <div class="verdict ok">VERDICT: SATISFIED</div>
+    <div class="metadata"><div class="meta"><span>Repo</span><strong>SpaghettiJedi/lights-out</strong></div><div class="meta"><span>PR</span><strong>#58</strong></div><div class="meta"><span>Issue</span><strong>#56</strong></div><div class="meta"><span>Run timing</span><strong>re-rendered with the lights-out brand template</strong></div><div class="meta"><span>Criteria</span><strong>3</strong></div><div class="meta"><span>Deviations</span><strong>0</strong></div></div>
+  </header>
+
   <div class="grid">
     <section><h2>Scope checklist</h2><ul>
 <li>✅ `npm test -- --run test/behaviors.test.ts` passes — test file added with comprehensive coverage: multiple behavior parsing, explicit None, malformed blocks ignored, evidence structure with modules, briefing rendering with tags</li>
@@ -33,17 +76,15 @@
 </ul></section>
     <section><h2>Proof summary</h2><ul><li><span class="pill unknown">see PR Proof</span> `npm test -- --run test/behaviors.test.ts` passes, covering: behavior-block parsing (multiple, none-declared, malformed ignored), evidence event shape with modules, and briefing section rendering with declared/undeclared tags</li><li><span class="pill unknown">see PR Proof</span> `make check` passes</li><li><span class="pill manual">operator check</span> [judgment] On the next live risk:standard run, the briefing&#39;s behaviors section is meaningful (operator confirms)</li></ul></section>
   </div>
-  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>Parser accepts both &quot;behavior&quot; and &quot;factory-behavior&quot; fence types, mirroring the existing deviation parser pattern for consistency</p></article>
-<article class="card"><h3>[technical]</h3><p>Incomplete behavior entries (missing any of what/why/where fields) are silently dropped rather than erroring — strict validation ensures telemetry rows are complete</p></article>
-<article class="card"><h3>[technical]</h3><p>Multi-line field values are joined with newlines to preserve explanation structure</p></article>
-<article class="card"><h3>[technical]</h3><p>Only coder-declared behaviors recorded as evidence telemetry; reviewer-detected undeclared behaviors block PRs via CHANGES_REQUIRED but don&#39;t create evidence rows — telemetry measures coder awareness, not reviewer catches</p></article>
-<article class="card"><h3>[technical]</h3><p>Briefing HTML has fallback rendering when behavior tags aren&#39;t found in briefing text, defaulting to showing declared behaviors</p></article></div>
-  <section><h2>Deviations</h2><ul>
-<li>[technical] Incomplete behavior entries (missing any of what/why/where fields) are silently dropped rather than erroring — strict validation ensures telemetry rows are complete</li>
-<li>[technical] Multi-line field values are joined with newlines to preserve explanation structure</li>
-<li>[technical] Only coder-declared behaviors recorded as evidence telemetry; reviewer-detected undeclared behaviors block PRs via CHANGES_REQUIRED but don&#39;t create evidence rows — telemetry measures coder awareness, not reviewer catches</li>
-<li>[technical] Briefing HTML has fallback rendering when behavior tags aren&#39;t found in briefing text, defaulting to showing declared behaviors</li>
-</ul></section>
+
+  <h2>Decision cards</h2>
+  <div class="grid"><article class="card technical"><h3>[technical]</h3><p>Parser accepts both &quot;behavior&quot; and &quot;factory-behavior&quot; fence types, mirroring the existing deviation parser pattern for consistency</p></article>
+<article class="card technical"><h3>[technical]</h3><p>Incomplete behavior entries (missing any of what/why/where fields) are silently dropped rather than erroring — strict validation ensures telemetry rows are complete</p></article>
+<article class="card technical"><h3>[technical]</h3><p>Multi-line field values are joined with newlines to preserve explanation structure</p></article>
+<article class="card technical"><h3>[technical]</h3><p>Only coder-declared behaviors recorded as evidence telemetry; reviewer-detected undeclared behaviors block PRs via CHANGES_REQUIRED but don&#39;t create evidence rows — telemetry measures coder awareness, not reviewer catches</p></article>
+<article class="card technical"><h3>[technical]</h3><p>Briefing HTML has fallback rendering when behavior tags aren&#39;t found in briefing text, defaulting to showing declared behaviors</p></article></div>
+
+  <section><h2>Deviation log</h2><p>No deviations reported.</p></section>
   <section><h2>Canonical plain-text briefing</h2><pre>VERDICT: SATISFIED
 
 ## Operator Briefing
@@ -82,8 +123,10 @@ This check will recur for the next 3-5 WorkOrders until the protocol stabilizes 
 
 ### Be aware
 
-This is the bootstrap WorkOrder adding the behavior protocol itself — above behaviors were not declared because the requirement didn&#39;t exist yet. Future WorkOrders will require declarations. The test coverage is thorough (parsing, evidence shape, briefing rendering), but the comparison logic enforcing CHANGES_REQUIRED for undeclared behaviors lives in the review prompt instruction, not testable code — first live run is the real validation that reviewers follow the protocol correctly.</pre></section>
-  <footer>Cost/usage: input 9, output 6284, cost 0.16081099999999998 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/58" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/58</a>.</footer>
+This is the bootstrap WorkOrder adding the behavior protocol itself — above behaviors were not declared because the requirement didn&#39;t exist yet. Future WorkOrders will require declarations. The test coverage is thorough (parsing, evidence shape, briefing rendering), but the comparison logic enforcing CHANGES_REQUIRED for undeclared behaviors lives in the review prompt instruction, not testable code — first live run is the real validation that reviewers follow the protocol correctly.
+
+---</pre></section>
+  <footer>Cost/usage: input 0, output 0, cost 0 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/58" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/58</a>.</footer>
 </main>
 </body>
 </html>

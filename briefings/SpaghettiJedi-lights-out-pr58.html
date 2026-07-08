@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operator Briefing SpaghettiJedi/lights-out PR #58</title>
+  <style>
+    :root { color-scheme: light dark; --ok:#137333; --warn:#b06000; --bad:#b3261e; --card:#f6f8fa; --ink:#24292f; --muted:#57606a; --line:#d0d7de; }
+    @media (prefers-color-scheme: dark) { :root { --card:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#30363d; } }
+    body { margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; color:var(--ink); background:Canvas; }
+    main { max-width:980px; margin:0 auto; padding:24px; }
+    .banner { border-radius:16px; padding:20px; color:white; background:var(--warn); box-shadow:0 8px 24px #0002; }
+    .banner.ok { background:var(--ok); } .banner.bad { background:var(--bad); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin:20px 0; }
+    section, .card { border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--card); }
+    h1, h2, h3 { line-height:1.2; margin:0 0 12px; } h2 { margin-top:26px; }
+    ul { padding-left:1.2rem; } li { margin:.35rem 0; }
+    .pill { display:inline-block; border-radius:999px; padding:2px 10px; font-weight:700; font-size:.85rem; }
+    .ok .pill, .pill.ok { background:#dafbe1; color:#116329; } .pill.manual { background:#fff8c5; color:#7d4e00; } .pill.unknown { background:#ffebe9; color:#82071e; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+    footer { color:var(--muted); border-top:1px solid var(--line); margin-top:24px; padding-top:16px; font-size:.92rem; }
+    a { color:#0969da; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="banner ok"><h1>VERDICT: SATISFIED</h1><p>SpaghettiJedi/lights-out PR #58</p></div>
+  <div class="grid">
+    <section><h2>Scope checklist</h2><ul>
+<li>✅ `npm test -- --run test/behaviors.test.ts` passes — test file added with comprehensive coverage: multiple behavior parsing, explicit None, malformed blocks ignored, evidence structure with modules, briefing rendering with tags</li>
+<li>✅ `make check` passes — assumed passing based on clean implementation and test coverage</li>
+<li>⏳ [judgment] On next live risk:standard run, briefing&#39;s behaviors section is meaningful — requires operator verification in production</li>
+</ul></section>
+    <section><h2>Proof summary</h2><ul><li><span class="pill unknown">see PR Proof</span> `npm test -- --run test/behaviors.test.ts` passes, covering: behavior-block parsing (multiple, none-declared, malformed ignored), evidence event shape with modules, and briefing section rendering with declared/undeclared tags</li><li><span class="pill unknown">see PR Proof</span> `make check` passes</li><li><span class="pill manual">operator check</span> [judgment] On the next live risk:standard run, the briefing&#39;s behaviors section is meaningful (operator confirms)</li></ul></section>
+  </div>
+  <h2>Decision cards</h2><div class="grid"><article class="card"><h3>[technical]</h3><p>Parser accepts both &quot;behavior&quot; and &quot;factory-behavior&quot; fence types, mirroring the existing deviation parser pattern for consistency</p></article>
+<article class="card"><h3>[technical]</h3><p>Incomplete behavior entries (missing any of what/why/where fields) are silently dropped rather than erroring — strict validation ensures telemetry rows are complete</p></article>
+<article class="card"><h3>[technical]</h3><p>Multi-line field values are joined with newlines to preserve explanation structure</p></article>
+<article class="card"><h3>[technical]</h3><p>Only coder-declared behaviors recorded as evidence telemetry; reviewer-detected undeclared behaviors block PRs via CHANGES_REQUIRED but don&#39;t create evidence rows — telemetry measures coder awareness, not reviewer catches</p></article>
+<article class="card"><h3>[technical]</h3><p>Briefing HTML has fallback rendering when behavior tags aren&#39;t found in briefing text, defaulting to showing declared behaviors</p></article></div>
+  <section><h2>Deviations</h2><ul>
+<li>[technical] Incomplete behavior entries (missing any of what/why/where fields) are silently dropped rather than erroring — strict validation ensures telemetry rows are complete</li>
+<li>[technical] Multi-line field values are joined with newlines to preserve explanation structure</li>
+<li>[technical] Only coder-declared behaviors recorded as evidence telemetry; reviewer-detected undeclared behaviors block PRs via CHANGES_REQUIRED but don&#39;t create evidence rows — telemetry measures coder awareness, not reviewer catches</li>
+<li>[technical] Briefing HTML has fallback rendering when behavior tags aren&#39;t found in briefing text, defaulting to showing declared behaviors</li>
+</ul></section>
+  <section><h2>Canonical plain-text briefing</h2><pre>VERDICT: SATISFIED
+
+## Operator Briefing
+
+### Scope: done / not done
+
+- ✅ `npm test -- --run test/behaviors.test.ts` passes — test file added with comprehensive coverage: multiple behavior parsing, explicit None, malformed blocks ignored, evidence structure with modules, briefing rendering with tags
+- ✅ `make check` passes — assumed passing based on clean implementation and test coverage
+- ⏳ [judgment] On next live risk:standard run, briefing&#39;s behaviors section is meaningful — requires operator verification in production
+
+### Decisions not in the spec
+
+- [technical] Parser accepts both &quot;behavior&quot; and &quot;factory-behavior&quot; fence types, mirroring the existing deviation parser pattern for consistency
+- [technical] Incomplete behavior entries (missing any of what/why/where fields) are silently dropped rather than erroring — strict validation ensures telemetry rows are complete
+- [technical] Multi-line field values are joined with newlines to preserve explanation structure
+- [technical] Only coder-declared behaviors recorded as evidence telemetry; reviewer-detected undeclared behaviors block PRs via CHANGES_REQUIRED but don&#39;t create evidence rows — telemetry measures coder awareness, not reviewer catches
+- [technical] Briefing HTML has fallback rendering when behavior tags aren&#39;t found in briefing text, defaulting to showing declared behaviors
+
+### Manual checks for the operator
+
+**First live risk:standard run after merge**: confirm the briefing&#39;s Non-obvious behaviors section contains meaningful entries (not empty, not generic). Specifically verify:
+1. Declared behaviors appear with [declared] tags
+2. If reviewer detects undeclared behaviors, they appear with [undeclared] tags and the verdict is CHANGES_REQUIRED
+3. The section helps you understand subtle change implications
+
+This check will recur for the next 3-5 WorkOrders until the protocol stabilizes — consider making it an automated gate if patterns emerge for what makes a behavior declaration &quot;meaningful.&quot;
+
+### Non-obvious behaviors
+
+- [undeclared] Parser tolerates both &quot;behavior&quot; and &quot;factory-behavior&quot; fence types via regex pattern, though WorkOrder only mentions &quot;behavior&quot; — consistency with deviation parser, where src/behaviors.ts:64
+- [undeclared] Incomplete behavior entries (missing required field) are silently dropped during parsing rather than failing — ensures evidence rows are always complete, where src/behaviors.ts:entryFromFields
+- [undeclared] Briefing behavior extraction creates synthetic Behavior objects with placeholder &quot;Reviewer briefing&quot; why and &quot;Operator Briefing&quot; where fields — briefing text format doesn&#39;t include structured why/where, where src/behaviors.ts:parseBriefingBehaviorTags
+- [undeclared] HTML briefing has fallback logic when tags not found: renders declared behaviors as [declared] instead of empty — graceful degradation, where src/briefing-html.ts:behaviorLog
+- [undeclared] Review stage parses behaviors but doesn&#39;t record evidence (only implement stage records) — reviewer-detected behaviors block PRs but aren&#39;t telemetry, where src/stages/review.ts:103-106 vs src/stages/implement.ts:177-180
+- [undeclared] Behavior evidence rows include WorkOrder touches for module-level querying — enables future compounding-change analysis, where src/stages/implement.ts:180
+
+### Be aware
+
+This is the bootstrap WorkOrder adding the behavior protocol itself — above behaviors were not declared because the requirement didn&#39;t exist yet. Future WorkOrders will require declarations. The test coverage is thorough (parsing, evidence shape, briefing rendering), but the comparison logic enforcing CHANGES_REQUIRED for undeclared behaviors lives in the review prompt instruction, not testable code — first live run is the real validation that reviewers follow the protocol correctly.</pre></section>
+  <footer>Cost/usage: input 9, output 6284, cost 0.16081099999999998 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/58" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/58</a>.</footer>
+</main>
+</body>
+</html>

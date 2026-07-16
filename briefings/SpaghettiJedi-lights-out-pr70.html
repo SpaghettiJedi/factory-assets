@@ -115,90 +115,34 @@
   </div></header>
 
   <div class="wrap">
-    <section class="verdict bad">
+    <section class="verdict ">
       <div class="band">
-        <div class="v">VERDICT: CHANGES_REQUIRED</div>
+        <div class="v">I&#39;ll review the diff against the WorkOrder. First, let me check whether the change is applied in this checkout so I can run the verification commands rather than only reading the diff.</div>
         <div class="sub">Cross-vendor review · the reviewer never wrote this code · your gate is product intent, not code quality</div>
       </div>
     </section>
 
-    <div class="metabar"><div class="meta"><span>Repo</span><strong>SpaghettiJedi/lights-out</strong></div><div class="meta"><span>PR</span><strong>#70</strong></div><div class="meta"><span>Issue</span><strong>#69</strong></div><div class="meta"><span>Run timing</span><strong>review round 1</strong></div><div class="meta"><span>Criteria</span><strong>4</strong></div><div class="meta"><span>Deviations</span><strong>0</strong></div><div class="meta"><span>Behaviors</span><strong>0</strong></div></div>
+    <div class="metabar"><div class="meta"><span>Repo</span><strong>SpaghettiJedi/lights-out</strong></div><div class="meta"><span>PR</span><strong>#70</strong></div><div class="meta"><span>Issue</span><strong>#69</strong></div><div class="meta"><span>Run timing</span><strong>review round 2</strong></div><div class="meta"><span>Criteria</span><strong>4</strong></div><div class="meta"><span>Deviations</span><strong>0</strong></div><div class="meta"><span>Behaviors</span><strong>0</strong></div></div>
 
     <h2>Scope</h2>
     <div class="cols">
-      <div class="panel"><h3>Scope checklist</h3><ul>
-<li>**Unit tests for retry behavior** — Done on paper: the new test file covers every case the WorkOrder names (Pi&#39;s captured overload shape normalizing to a stable reason with the original provider text preserved, exactly one fresh session on the identical route with a retry evidence event, second overload terminal, unknown/authentication/other failures terminal, retry staying inside the session budget with no fallback or API billing). Whether the tests actually pass is UNKNOWN — the change is not applied in this review checkout, so I could not execute them. The CI gate must confirm before merge.</li>
-<li>**Self-test gate script** — Done: the new gate plants the three required failure sequences (overload-then-success, repeated overload, unknown error) and proves both that the real policy rescues only the allowlisted sequence and that a broken policy (never-retry or always-retry) would be caught. Execution UNKNOWN for the same reason as above.</li>
-<li>**Gate wired into the aggregate check** — Done: the new gate is registered as its own command and inserted into the repository&#39;s single aggregate check command.</li>
-<li>**`make check` passes** — UNKNOWN: not executable against this snapshot. Must be confirmed by CI before this leaves draft.</li>
-</ul></div>
+      <div class="panel"><h3>Scope checklist</h3><ul><li>package.json</li><li>scripts/check-harness-retry.ts</li><li>src/harness/adapter.ts</li><li>src/harness/pi.ts</li><li>src/harness/retry.ts</li><li>src/stages/implement.ts</li><li>test/harness-retry.test.ts</li></ul></div>
       <div class="panel"><h3>Proof summary</h3><ul><li><span class="pill unknown">see PR Proof</span> `npm test -- --run test/harness-retry.test.ts` passes, covering: Pi&#39;s captured provider-overload shape is normalized to a stable `provider_overloaded` reason with the original provider detail preserved; the first overload starts exactly one fresh session on the unchanged route and records a `harness_retry` evidence event; a second overload is terminal; unknown, authentication, and other non-allowlisted failures are terminal without retry; retry remains inside the existing session budget and never enables route fallback or API billing.</li><li><span class="pill unknown">see PR Proof</span> `npx tsx scripts/check-harness-retry.ts --self-test` plants overload-then-success, repeated-overload, and unknown-error sequences and proves the retry policy rescues only the explicitly allowlisted transient sequence while failing closed at the bound.</li><li><span class="pill unknown">see PR Proof</span> `npm run check:harness-retry` passes and is wired into the aggregate repository gate.</li><li><span class="pill unknown">see PR Proof</span> `make check` passes with the harness-retry gate included.</li></ul></div>
     </div>
 
     <h2>Decisions not in the spec</h2>
-    <div class="cards"><article class="card product"><h3>[product]</h3><p>`` Overload detection works by keyword-matching the word &quot;overload&quot; anywhere in the provider&#39;s error text — and for the Pi harness, when Pi supplies no structured error payload, classification falls back to the assistant&#39;s own reply text. That means a non-transient failure whose accompanying text merely mentions &quot;overloaded&quot; could be classified as retryable. This softens the WorkOrder&#39;s fail-closed stance for unknown failures. Exposure is capped at one extra session, but the operator should decide whether text-fallback classification is acceptable.</p></article>
-<article class="card product"><h3>[product]</h3><p>`` The Claude Code harness was also given failure normalization, even though it was not in the WorkOrder&#39;s planned file list. Practical effect: overload failures on the second harness are now retry-eligible too, not just Pi. Consistent with the &quot;provider-neutral&quot; goal, but it widens the blast radius of this change and was not recorded as a deviation.</p></article>
-<article class="card technical"><h3>[technical]</h3><p>`` The policy adds two extra refusal conditions beyond the spec: no retry on API-billed routes, and no retry when the session budget is already exhausted. Both align with the WorkOrder&#39;s intent (never bill API keys, stay inside budget) and are tested.</p></article>
-<article class="card technical"><h3>[technical]</h3><p>`` Every turn&#39;s timeout — retry or not — is now capped by the time remaining in the session budget, where previously a turn starting near the deadline could run its full standalone timeout. A behavior change for all runs, not just overload retries.</p></article>
-<article class="card technical"><h3>[technical]</h3><p>`` The evidence written on a failed turn changed shape: the field previously named `detail` was replaced by new fields, and the incident text now carries the raw provider error rather than the harness-framed message. The weekly report tooling reads a `detail` field from evidence; whether it consumes this specific event is UNKNOWN from this snapshot, but a silent report regression is possible.</p></article></div>
+    <div class="cards"><article class="card"><h3>No off-spec decisions reported</h3><p>None.</p></article></div>
 
     <h2>Non-obvious behaviors</h2>
-    <div class="panel"><ul><li><span class="pill undeclared">undeclared</span> `` Pi failure classification can fall back to assistant-generated reply text when no structured error payload exists, so retry eligibility can be decided by model output rather than a provider signal.</li><li><span class="pill undeclared">undeclared</span> `` Overload matching is substring-based over free text, not a check against the captured structured error shape.</li><li><span class="pill undeclared">undeclared</span> `` The Claude Code harness gained failure normalization and therefore retry eligibility — a file outside the WorkOrder&#39;s plan, with no recorded deviation.</li><li><span class="pill undeclared">undeclared</span> `` All turn timeouts are now capped by remaining session budget, changing timing behavior for every run, including ones that never hit an overload.</li><li><span class="pill undeclared">undeclared</span> `` The turn-failure evidence event&#39;s schema changed (field renamed, new fields added), and the terminal failure detail now carries raw provider text instead of the framed harness message — potentially affecting downstream evidence readers.</li><li><span class="pill undeclared">undeclared</span> `` The single retry budget spans the entire implement run across all fix rounds, and a retry mid-run starts a completely fresh session that has no memory of earlier conversation turns (only the worktree state carries over).</li></ul></div>
+    <div class="panel"><p>No non-obvious behaviors declared or detected.</p></div>
 
     <h2>Deviation log · plan vs territory</h2>
     <p>No deviations reported.</p>
 
     <h2>Full reviewer text</h2>
-    <details><summary>Expand the complete briefing as written by the reviewer</summary><pre>VERDICT: CHANGES_REQUIRED
+    <details><summary>Expand the complete briefing as written by the reviewer</summary><pre>I&#39;ll review the diff against the WorkOrder. First, let me check whether the change is applied in this checkout so I can run the verification commands rather than only reading the diff.</pre></details>
 
-## Operator Briefing
-
-### Scope: done / not done
-
-- **Unit tests for retry behavior** — Done on paper: the new test file covers every case the WorkOrder names (Pi&#39;s captured overload shape normalizing to a stable reason with the original provider text preserved, exactly one fresh session on the identical route with a retry evidence event, second overload terminal, unknown/authentication/other failures terminal, retry staying inside the session budget with no fallback or API billing). Whether the tests actually pass is UNKNOWN — the change is not applied in this review checkout, so I could not execute them. The CI gate must confirm before merge.
-- **Self-test gate script** — Done: the new gate plants the three required failure sequences (overload-then-success, repeated overload, unknown error) and proves both that the real policy rescues only the allowlisted sequence and that a broken policy (never-retry or always-retry) would be caught. Execution UNKNOWN for the same reason as above.
-- **Gate wired into the aggregate check** — Done: the new gate is registered as its own command and inserted into the repository&#39;s single aggregate check command.
-- **`make check` passes** — UNKNOWN: not executable against this snapshot. Must be confirmed by CI before this leaves draft.
-
-### Decisions not in the spec
-
-- `[product]` Overload detection works by keyword-matching the word &quot;overload&quot; anywhere in the provider&#39;s error text — and for the Pi harness, when Pi supplies no structured error payload, classification falls back to the assistant&#39;s own reply text. That means a non-transient failure whose accompanying text merely mentions &quot;overloaded&quot; could be classified as retryable. This softens the WorkOrder&#39;s fail-closed stance for unknown failures. Exposure is capped at one extra session, but the operator should decide whether text-fallback classification is acceptable.
-- `[product]` The Claude Code harness was also given failure normalization, even though it was not in the WorkOrder&#39;s planned file list. Practical effect: overload failures on the second harness are now retry-eligible too, not just Pi. Consistent with the &quot;provider-neutral&quot; goal, but it widens the blast radius of this change and was not recorded as a deviation.
-- `[technical]` The policy adds two extra refusal conditions beyond the spec: no retry on API-billed routes, and no retry when the session budget is already exhausted. Both align with the WorkOrder&#39;s intent (never bill API keys, stay inside budget) and are tested.
-- `[technical]` Every turn&#39;s timeout — retry or not — is now capped by the time remaining in the session budget, where previously a turn starting near the deadline could run its full standalone timeout. A behavior change for all runs, not just overload retries.
-- `[technical]` The evidence written on a failed turn changed shape: the field previously named `detail` was replaced by new fields, and the incident text now carries the raw provider error rather than the harness-framed message. The weekly report tooling reads a `detail` field from evidence; whether it consumes this specific event is UNKNOWN from this snapshot, but a silent report regression is possible.
-
-### Manual checks for the operator
-
-- After the first real run that hits a turn failure post-merge, open the weekly operator report and confirm the failure narrative still shows meaningful error text rather than a blank. This is a one-time check driven by the evidence field rename; if the report tooling has a fixture test, this should become automated there instead of recurring manually.
-
-### Non-obvious behaviors
-
-The implementer declared none. I independently detected six, all undeclared:
-
-- `[undeclared]` Pi failure classification can fall back to assistant-generated reply text when no structured error payload exists, so retry eligibility can be decided by model output rather than a provider signal.
-- `[undeclared]` Overload matching is substring-based over free text, not a check against the captured structured error shape.
-- `[undeclared]` The Claude Code harness gained failure normalization and therefore retry eligibility — a file outside the WorkOrder&#39;s plan, with no recorded deviation.
-- `[undeclared]` All turn timeouts are now capped by remaining session budget, changing timing behavior for every run, including ones that never hit an overload.
-- `[undeclared]` The turn-failure evidence event&#39;s schema changed (field renamed, new fields added), and the terminal failure detail now carries raw provider text instead of the framed harness message — potentially affecting downstream evidence readers.
-- `[undeclared]` The single retry budget spans the entire implement run across all fix rounds, and a retry mid-run starts a completely fresh session that has no memory of earlier conversation turns (only the worktree state carries over).
-
-### Be aware
-
-- Cost: worst case, every overloaded run now consumes one additional full session before failing — still inside the existing wall-clock budget, and only on subscription billing, so no new API spend risk.
-- Cross-repo effect: this changes implement-stage behavior for every target repo the factory serves, on both harnesses.
-- The recurrence protocol is satisfied in structure: the remediation ships with a gate that has a self-test, closing the gap from Lights Out incident #34.
-- Verification status is honest UNKNOWN throughout: this review checkout is a truncated snapshot without the diff applied, so no test, gate, or `make check` result was observed firsthand.
-
-### Required changes
-
-1. Declare the non-obvious behaviors. The implementer declared &quot;None&quot;; the six behaviors listed above must each be declared (or eliminated). This alone mandates the CHANGES_REQUIRED verdict under the review contract.
-2. Restrict Pi failure-reason classification to the structured error payload Pi provides. Do not classify from the assistant&#39;s reply text; keep the text fallback only for the human-readable provider detail recorded in evidence. As written, a terminal failure whose reply text mentions &quot;overloaded&quot; is silently promoted into the retry allowlist, violating the WorkOrder&#39;s fail-closed requirement for ambiguous failures.
-3. Record the Claude Code harness change as a structured deviation in PROGRESS.md (it is outside the WorkOrder&#39;s declared file list), or remove it and scope this change to Pi as planned. If kept, add at least one test exercising normalization through that harness&#39;s failure path — it currently has none.
-4. Confirm no evidence consumer reads the old `detail` field of the turn-failure event (the weekly report tooling reads a field by that name). Either keep the old field alongside the new ones or verify and state that nothing consumes it; per the honesty rule, this must be verified, not assumed.
-5. Have CI (or the implementer locally) run and report all four verification commands from the WorkOrder — none were executable in this review environment, so green results are currently unproven.</pre></details>
-
-    <footer>Cost/usage: input 1, output 12075, cost 0.634634 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/70" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/70</a>.</footer>
+    <footer>Cost/usage: input 1, output 6093, cost 0.6357510000000001 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/lights-out/pull/70" rel="noreferrer">https://github.com/SpaghettiJedi/lights-out/pull/70</a>.</footer>
   </div>
 </body>
 </html>

@@ -115,69 +115,34 @@
   </div></header>
 
   <div class="wrap">
-    <section class="verdict bad">
+    <section class="verdict ">
       <div class="band">
-        <div class="v">VERDICT: CHANGES_REQUIRED</div>
+        <div class="v">I&#39;ll verify the diff&#39;s claims against the actual repository before writing the briefing — in particular whether the `--runtime` flag the new npm script relies on actually exists in the script&#39;s entrypoint, since the diff never adds handling for it.</div>
         <div class="sub">Cross-vendor review · the reviewer never wrote this code · your gate is product intent, not code quality</div>
       </div>
     </section>
 
-    <div class="metabar"><div class="meta"><span>Repo</span><strong>SpaghettiJedi/hughes-power-pool</strong></div><div class="meta"><span>PR</span><strong>#34</strong></div><div class="meta"><span>Issue</span><strong>#13</strong></div><div class="meta"><span>Run timing</span><strong>review round 0</strong></div><div class="meta"><span>Criteria</span><strong>3</strong></div><div class="meta"><span>Deviations</span><strong>0</strong></div><div class="meta"><span>Behaviors</span><strong>0</strong></div></div>
+    <div class="metabar"><div class="meta"><span>Repo</span><strong>SpaghettiJedi/hughes-power-pool</strong></div><div class="meta"><span>PR</span><strong>#34</strong></div><div class="meta"><span>Issue</span><strong>#13</strong></div><div class="meta"><span>Run timing</span><strong>review round 1</strong></div><div class="meta"><span>Criteria</span><strong>3</strong></div><div class="meta"><span>Deviations</span><strong>0</strong></div><div class="meta"><span>Behaviors</span><strong>0</strong></div></div>
 
     <h2>Scope</h2>
     <div class="cols">
-      <div class="panel"><h3>Scope checklist</h3><ul>
-<li>**Exact-runtime gate (`npm run check:runtime`) — cannot be confirmed done.** The new command was added and wired up, but the change never shows the part of the checker that actually reads the live Node and npm versions when this command runs. The version-comparison logic exists and is tested internally, yet nothing in the diff connects the new command-line flag to it. If that connection was already in the file before this change, the implementer needed to say so; as delivered, there is no evidence the command would fail under a wrong runtime rather than silently doing something else. Follow-up: require the implementer to show (or add) the code path that makes this command check the machine&#39;s actual Node and npm, with proof it fails under a mismatch.</li>
-<li>**Self-test rejects planted wrong-Node and wrong-npm pairs — done.** The self-test now plants a wrong Node with correct npm, a wrong npm with correct Node, and the correct pair, and verifies each is accepted or rejected with the right message. It also plants a sabotaged Makefile and a sabotaged script entry and confirms both are caught.</li>
-<li>**Runtime policy runs first in `make check` — done.** The runtime check is now the first step of the trust command, and a new permanent guard fails the repository&#39;s supply-chain check if anyone ever removes it or moves it out of first position.</li>
-</ul></div>
+      <div class="panel"><h3>Scope checklist</h3><ul><li>Makefile</li><li>docs/quality.md</li><li>package.json</li><li>tools/repository/check-supply-chain.mjs</li></ul></div>
       <div class="panel"><h3>Proof summary</h3><ul><li><span class="pill unknown">see PR Proof</span> `npm run check:runtime` passes only under the exact Node and npm versions selected by repository policy.</li><li><span class="pill unknown">see PR Proof</span> `node tools/repository/check-supply-chain.mjs --self-test` proves that planted wrong-Node and wrong-npm pairs are rejected.</li><li><span class="pill unknown">see PR Proof</span> `make check` runs the runtime policy before every other required gate and passes under the selected runtime.</li></ul></div>
     </div>
 
     <h2>Decisions not in the spec</h2>
-    <div class="cards"><article class="card technical"><h3>[technical]</h3><p>`` The implementer chose to enforce the &quot;runs first&quot; requirement by having the supply-chain checker read the Makefile and the package script list and demand an exact character-for-character match. This is a reasonable mechanical control, but its strictness has side effects listed under Non-obvious behaviors.</p></article>
-<article class="card technical"><h3>[technical]</h3><p>`` The quality documentation now states the exact required versions (Node 24.18.0, npm 12.0.1) as prose. The npm number matches what the tool enforces; the Node number is actually sourced from a separate version file that this reviewer cannot see, so the documented number could not be verified and nothing keeps the prose in sync when the version file changes.</p></article></div>
+    <div class="cards"><article class="card"><h3>No off-spec decisions reported</h3><p>None.</p></article></div>
 
     <h2>Non-obvious behaviors</h2>
-    <div class="panel"><ul><li><span class="pill undeclared">undeclared</span> `` The supply-chain checker now parses the Makefile. Any future edit to the trust command&#39;s recipe — reordering steps, adding a prerequisite to the target line, or even prefixing the first step with the common &quot;silence output&quot; marker — will fail a gate that appears unrelated to the Makefile, with a message that doesn&#39;t explain the exact-match requirement.</li><li><span class="pill undeclared">undeclared</span> `` The exact text of the new runtime script in package.json is likewise locked; renaming or rewording it breaks the supply-chain check.</li><li><span class="pill undeclared">undeclared</span> `` The new command relies on a &quot;--runtime&quot; flag whose handling is nowhere in this change. Either it pre-existed (a material fact that should have been declared with a pointer) or the command does not do what the WorkOrder claims.</li></ul></div>
+    <div class="panel"><p>No non-obvious behaviors declared or detected.</p></div>
 
     <h2>Deviation log · plan vs territory</h2>
     <p>No deviations reported.</p>
 
     <h2>Full reviewer text</h2>
-    <details><summary>Expand the complete briefing as written by the reviewer</summary><pre>VERDICT: CHANGES_REQUIRED
+    <details><summary>Expand the complete briefing as written by the reviewer</summary><pre>I&#39;ll verify the diff&#39;s claims against the actual repository before writing the briefing — in particular whether the `--runtime` flag the new npm script relies on actually exists in the script&#39;s entrypoint, since the diff never adds handling for it.</pre></details>
 
-## Operator Briefing
-
-### Scope: done / not done
-- **Exact-runtime gate (`npm run check:runtime`) — cannot be confirmed done.** The new command was added and wired up, but the change never shows the part of the checker that actually reads the live Node and npm versions when this command runs. The version-comparison logic exists and is tested internally, yet nothing in the diff connects the new command-line flag to it. If that connection was already in the file before this change, the implementer needed to say so; as delivered, there is no evidence the command would fail under a wrong runtime rather than silently doing something else. Follow-up: require the implementer to show (or add) the code path that makes this command check the machine&#39;s actual Node and npm, with proof it fails under a mismatch.
-- **Self-test rejects planted wrong-Node and wrong-npm pairs — done.** The self-test now plants a wrong Node with correct npm, a wrong npm with correct Node, and the correct pair, and verifies each is accepted or rejected with the right message. It also plants a sabotaged Makefile and a sabotaged script entry and confirms both are caught.
-- **Runtime policy runs first in `make check` — done.** The runtime check is now the first step of the trust command, and a new permanent guard fails the repository&#39;s supply-chain check if anyone ever removes it or moves it out of first position.
-
-### Decisions not in the spec
-- `[technical]` The implementer chose to enforce the &quot;runs first&quot; requirement by having the supply-chain checker read the Makefile and the package script list and demand an exact character-for-character match. This is a reasonable mechanical control, but its strictness has side effects listed under Non-obvious behaviors.
-- `[technical]` The quality documentation now states the exact required versions (Node 24.18.0, npm 12.0.1) as prose. The npm number matches what the tool enforces; the Node number is actually sourced from a separate version file that this reviewer cannot see, so the documented number could not be verified and nothing keeps the prose in sync when the version file changes.
-
-### Manual checks for the operator
-None — the WorkOrder had no judgment-marked criteria. If the required changes are delivered, everything here is machine-verifiable.
-
-### Non-obvious behaviors
-The implementer declared none. This reviewer detected three, all undeclared:
-
-- `[undeclared]` The supply-chain checker now parses the Makefile. Any future edit to the trust command&#39;s recipe — reordering steps, adding a prerequisite to the target line, or even prefixing the first step with the common &quot;silence output&quot; marker — will fail a gate that appears unrelated to the Makefile, with a message that doesn&#39;t explain the exact-match requirement.
-- `[undeclared]` The exact text of the new runtime script in package.json is likewise locked; renaming or rewording it breaks the supply-chain check.
-- `[undeclared]` The new command relies on a &quot;--runtime&quot; flag whose handling is nowhere in this change. Either it pre-existed (a material fact that should have been declared with a pointer) or the command does not do what the WorkOrder claims.
-
-### Be aware
-- **Cross-WorkOrder effect:** every future change that touches the Makefile&#39;s check target or the package scripts must preserve these exact strings, or an apparently unrelated supply-chain gate will fail. Future implementers will hit this without warning; declaring it now is what makes it discoverable later.
-- **Documentation drift risk:** the required Node version lives in a version file, but the docs now hard-code a specific number with no guard keeping them consistent. Per this repository&#39;s own rules, a stale exact number is worse than a pointer to the source of truth.
-
-### Required changes
-1. **Prove or implement the runtime flag.** Show the code path where the &quot;--runtime&quot; flag causes the checker to compare the machine&#39;s live Node and npm versions against policy and exit non-zero on mismatch. If that dispatch does not exist, add it. Either way, declare it, and include proof that the command fails under a wrong runtime (the current self-test only exercises the internal comparison function, not the command itself).
-2. **Declare the Makefile enforcement.** Add to the declared non-obvious behaviors: the supply-chain check now requires an exact-match first line in the Makefile&#39;s check target and an exact-match script entry in package.json, including the specific edits that will break it (reordering, target prerequisites, output-silencing prefixes, renaming the script).
-3. **Fix the documentation coupling.** Either have the quality doc point to the version file as the source of truth for the Node number instead of hard-coding it, or add the doc to what the supply-chain guard verifies so the stated version cannot drift from the enforced one. Confirm the stated 24.18.0 actually matches the version file today.</pre></details>
-
-    <footer>Cost/usage: input 1, output 8063, cost 0.624904 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/hughes-power-pool/pull/34" rel="noreferrer">https://github.com/SpaghettiJedi/hughes-power-pool/pull/34</a>.</footer>
+    <footer>Cost/usage: input 1, output 2357, cost 0.13303600000000002 USD. Billing mode: subscription. PR: <a href="https://github.com/SpaghettiJedi/hughes-power-pool/pull/34" rel="noreferrer">https://github.com/SpaghettiJedi/hughes-power-pool/pull/34</a>.</footer>
   </div>
 </body>
 </html>
